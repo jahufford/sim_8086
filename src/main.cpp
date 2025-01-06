@@ -1,26 +1,23 @@
 #include <iostream>
-#include <gtest/gtest.h>
+#include <vector>
+#include <cstdint>
+#include <fstream>
+#include <cassert>
+#include "decode_instructions.h"
+#include <array>
+template <typename T>
+struct TD;
 
-#include "myclass.h"
 
 int main(int argc, char *argv[])
 {
-    // int x = TESTING;
-// #ifdef TESTING
-//     ::testing::InitGoogleTest(&argc, argv);
-//     int ret{RUN_ALL_TESTS()};
-//     if(!ret){
-//         std::cout << "<<<SUCCESS>>>" << std::endl;
-//     }else{
-//         std::cout << "FAILED" << std::endl;
-//     }
-// #else
-    std::cout << "Hello world!" << std::endl;
-    MyClass mc;
-    mc.foo();
-// #endif
+    std::string filename = "./src/data/0038_many_register_mov";
+    // std::string filename = "./src/data/0037_single_register_mov";
+    auto instructions = decode_instructions(load_binary(filename));
+    auto instruction_strs = instruction_to_strings(instructions);
+    for(auto line : instruction_strs){
+        std::cout << line << std::endl;
+    }
+    // write instructions to file
+    // write out bits 16
 }
-// TEST(someTest,testOne)
-// {
-//   ASSERT_EQ(5,5);
-// }
