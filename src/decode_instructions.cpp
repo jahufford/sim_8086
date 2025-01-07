@@ -1,5 +1,5 @@
 #include "decode_instructions.h"
-
+#include "decode_opcode.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -7,10 +7,14 @@
 #include <sstream>
 
 std::unordered_map<Opcode, std::string> instruction_strings = {
-    {Opcode::MOV, "mov"},
-    // {Opcode::PUSH1, "push"},
-    // {Opcode::PUSH2,` "push"},
-    // {Opcode::PUSH3,` "push"},
+    {Opcode::MOV1, "mov"},
+    {Opcode::MOV2, "mov"},
+    {Opcode::MOV3, "mov"},
+    {Opcode::MOV4, "mov"},
+    {Opcode::MOV5, "mov"},
+    {Opcode::MOV6, "mov"},
+    {Opcode::MOV7, "mov"},
+    {Opcode::MOV8, "mov"},
     {Opcode::POP, "pop"},
     {Opcode::ADD, "add"},
     {Opcode::ADC, "adc"},
@@ -42,7 +46,7 @@ std::array<std::array<Register,8>,2> register_decoder{
   }
 };
 
-std::vector<uint8_t> load_binary(std::string filename)
+std::vector<uint8_t> loadBinary(std::string filename)
 {
     std::ifstream fin;
     fin.open(filename, std::ios::binary);
@@ -53,7 +57,7 @@ std::vector<uint8_t> load_binary(std::string filename)
     return std::vector<uint8_t>(std::istreambuf_iterator<char>(fin),{});
     // file closes on exit of this function
 }
-std::vector<std::string> instruction_to_strings(std::vector<Instruction> instructions)
+std::vector<std::string> instructionToStrings(std::vector<Instruction> instructions)
 {
     std::vector<std::string> instruction_strs;
     for(auto& inst: instructions){
@@ -74,7 +78,7 @@ std::vector<std::string> instruction_to_strings(std::vector<Instruction> instruc
     }
     return instruction_strs;
 }
-std::vector<Instruction> decode_instructions(std::vector<uint8_t> binary_buffer)
+std::vector<Instruction> decodeInstructions(std::vector<uint8_t> binary_buffer)
 {
     // std::vector<std::string> instructions;
     std::vector<Instruction> instructions;
@@ -82,7 +86,8 @@ std::vector<Instruction> decode_instructions(std::vector<uint8_t> binary_buffer)
     while(byte_emitter != binary_buffer.cend())
     {
         uint8_t byte1 = (*byte_emitter++);
-        Opcode opcode = static_cast<Opcode>(byte1 >> 2); // grab 6 msb's
+        // Opcode opcode = static_cast<Opcode>(byte1 >> 2); // grab 6 msb's
+        Opcode opcode = decode_opcode(byte1);
         // check if it's a single byte opcode
         // if so then handle it and continue
         uint8_t D = (byte1 & 0x02)>>1; // direction 0 REG is source, 1 REG is destination
@@ -94,7 +99,7 @@ std::vector<Instruction> decode_instructions(std::vector<uint8_t> binary_buffer)
         uint8_t REG = (byte2 & 0b00111000)>>3;
         uint8_t RM = byte2 & 0b00000111;
         switch(opcode){
-            case Opcode::MOV:
+            case Opcode::MOV1:
                 if(MOD==0x03){
                     // register to register
                     Register src_reg, dst_reg;
