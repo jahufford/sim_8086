@@ -5,6 +5,6 @@
 
 
 
-Opcode decode_opcode(uint8_t byte);
+Opcode decodeOpcode(uint8_t byte);
 
 #endif /* AAE6A2E5_D164_4F4C_BFA8_2533DC6961CC */

@@ -13,20 +13,23 @@ struct TD;
 
 static std::unordered_map<std::string,Opcode> opcodes = { 
     {"100010xx", Opcode::MOV1},
-    {"1000101x", Opcode::MOV2},
+    {"1100011x", Opcode::MOV2},
     {"1011xxxx" ,Opcode::MOV3},
     {"1010000x" ,Opcode::MOV4},
-    // {"1010001x" ,Opcode::MOV5},
+    {"1010001x" ,Opcode::MOV5},
     // {"10001110" ,Opcode::MOV6},
-    // {"10001110" ,Opcode::MOV7},
-    // {"10001100" ,Opcode::MOV8},
+    // {"10001100" ,Opcode::MOV7},
     // {"10001100" ,Opcode::PUSH1},
     // {"01010xxx" ,Opcode::PUSH2},
     // {"000xx110" ,Opcode::PUSH3},
+    // {"10001111" ,Opcode::POP1},
+    // {"01011xxx" ,Opcode::POP2},
+    // {"000xx111" ,Opcode::POP3},
+    // {"1000011x" ,Opcode::XCHG1},
+    // {"10010xxx" ,Opcode::XCHG2},
 };
 struct InstTreeNode;
 
-// using InstTree = std::vector<InstTreeNode>(3); // specify size
 using InstTree = std::vector<InstTreeNode>;
 
 struct InstTreeNode{
@@ -37,35 +40,26 @@ struct InstTreeNode{
     InstTree children;
 };
 
-static bool has(InstTree& vect, char bit){
-    for(auto& item: vect){
-        if(item.bit == bit){
-            return true;
-        }
-    }
-    return false;
-}
 void placeInTree(InstTree& level, std::string::const_iterator bit_iter, std::string::const_iterator bit_end, Opcode& opcode)
 {
     if(bit_iter==bit_end){
-        level.push_back(InstTreeNode{.opcode=opcode});
+        level.push_back(InstTreeNode{.opcode=opcode,.children=std::vector<InstTreeNode>{}});
         return;
     }
     char bit = *bit_iter;
-    if(!has(level,bit)){
-        level.push_back(InstTreeNode{.bit=bit});
+    const auto elem = std::find_if(level.begin(), level.end(), 
+        [bit](auto item){return item.bit==bit;}
+    );
+    if(elem==level.end()){
+        level.push_back(InstTreeNode{.bit=bit,.children=std::vector<InstTreeNode>{}});
+        placeInTree(level.back().children,++bit_iter,bit_end,opcode);
+    }else{
+        placeInTree(elem->children,++bit_iter,bit_end,opcode);
     }
-    // auto& new_level = level.back();
-    ++bit_iter;
-    placeInTree(level.back().children,bit_iter,bit_end,opcode);
 }
 InstTree createDecoderTree()
 {
     InstTree tree;
-    InstTree* level = &tree;
-    for(auto& item: *level){
-        std::cout << item.bit << std::endl;
-    }
     for(auto& kv: opcodes){
         auto bit = kv.first.cbegin();
         auto bit_end = kv.first.cend();
@@ -89,7 +83,7 @@ std::string makeString(uint8_t byte)
     return sstr.str();
 }
 
-Opcode findInTree_impl(InstTree& level, std::string::const_iterator cur_bit, std::string::const_iterator end)
+Opcode findInTree_impl(InstTree& level, std::string::const_iterator cur_bit, std::string::const_iterator end, std::string opcode_str)
 {
     if(cur_bit==end){
         return level.at(0).opcode;
@@ -97,18 +91,24 @@ Opcode findInTree_impl(InstTree& level, std::string::const_iterator cur_bit, std
     char bit = *cur_bit;
     auto elem = std::find_if(level.begin(),level.end(),
         [bit](auto item){ 
-            return (item.bit==bit) || (item.bit=='x');
+            return item.bit==bit;
     });
+    if(elem==level.end()){
+        elem = std::find_if(level.begin(),level.end(),
+            [bit](auto item){ 
+                return item.bit=='x';
+        });
+    }
     assert(elem!=level.end());
-    return findInTree_impl(elem->children, ++cur_bit,end);
+    return findInTree_impl(elem->children, ++cur_bit,end,opcode_str);
 }
 
 Opcode findInTree(std::string opcode_str)
 {
-    return findInTree_impl(decoder_tree, opcode_str.cbegin(), opcode_str.cend());
+    return findInTree_impl(decoder_tree, opcode_str.cbegin(), opcode_str.cend(), opcode_str);
 }
 
-Opcode decode_opcode(uint8_t byte)
+Opcode decodeOpcode(uint8_t byte)
 {
     std::string opcode_str = makeString(byte);
     return findInTree(opcode_str);
