@@ -13,7 +13,9 @@ int main(int argc, char *argv[])
     argv=argv; //suppress warning
     // std::string filename = "./src/data/0039_more_movs";
     // std::string filename = "./src/data/0037_single_register_mov";
-    std::string filename = "./src/data/0040_challenge_movs";
+    // std::string filename = "./src/data/0040_challenge_movs";
+    // std::string filename = "./src/data/0041_add_sub_cmp_jnz";
+    std::string filename = "./src/data/add_direct";
     auto instructions = decodeInstructions(loadBinary(filename));
     auto instruction_strs = instructionsToStrings(instructions);
     for(auto line : instruction_strs){

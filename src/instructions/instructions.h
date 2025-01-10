@@ -14,6 +14,37 @@ enum  class Opcode
     MOV3,
     MOV4,
     MOV5,
+    ADDSUBCMP2,
+    ADD1,
+    ADD2,
+    ADD3,
+    SUB1,
+    SUB2,
+    SUB3,
+    CMP1,
+    CMP2,
+    CMP3,
+    JNZ,
+    JE,
+    JL,
+    JLE,
+    JB,
+    JBE,
+    JP,
+    JO,
+    JS,
+    JNL,
+    JG,
+    JNB,
+    JA,
+    JNP,
+    JNO,
+    JNS,
+    LOOP,
+    LOOPZ,
+    LOOPNZ,
+    JCXZ,
+
     // MOV6,
     // MOV7,
     // PUSH1,
@@ -112,4 +143,7 @@ std::string effectiveAddressToString(EffectiveAddress& ea);
 std::string instructionToString(Instruction& inst);
 
 #include "mov.h"
+#include "addsubcmp.h"
+#include "jmp.h"
+
 #endif /* E1A250DB_764D_4CBF_9D35_C539D945EB20 */

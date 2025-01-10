@@ -9,6 +9,35 @@ std::unordered_map<Opcode, std::string> opcode_strings = {
     {Opcode::MOV3, "mov"},
     {Opcode::MOV4, "mov"},
     {Opcode::MOV5, "mov"},
+    {Opcode::ADD1, "add"},
+    {Opcode::ADD2, "add"},
+    {Opcode::ADD3, "add"},
+    {Opcode::SUB1, "sub"},
+    {Opcode::SUB2, "sub"},
+    {Opcode::SUB3, "sub"},
+    {Opcode::CMP1, "cmp"},
+    {Opcode::CMP2, "cmp"},
+    {Opcode::CMP3, "cmp"},
+    {Opcode::JNZ, "jnz"},
+    {Opcode::JE,  "je"},
+    {Opcode::JL,  "jl"},
+    {Opcode::JLE, "jle"},
+    {Opcode::JB,  "jb"},
+    {Opcode::JBE, "jbe"},
+    {Opcode::JP,  "jp"},
+    {Opcode::JO,  "jo"},
+    {Opcode::JS,  "js"},
+    {Opcode::JNL, "jnl"},
+    {Opcode::JG,  "jg"},
+    {Opcode::JNB, "jnb"},
+    {Opcode::JA,  "ja"},
+    {Opcode::JNP, "jnp"},
+    {Opcode::JNO, "jno"},
+    {Opcode::JNS, "jns"},
+    {Opcode::LOOP, "loop"},
+    {Opcode::LOOPZ, "loopz"},
+    {Opcode::LOOPNZ, "loopnz"},
+    {Opcode::JCXZ, "jcxz"},
     // {Opcode::MOV6, "mov"},
     // {Opcode::MOV7, "mov"},
     // {Opcode::POP1, "pop"},
@@ -121,7 +150,8 @@ std::string effectiveAddressToString(EffectiveAddress& ea)
         if(ea.address.secondReg != Register::NOREG){
             eas << " + " << register_strings[ea.address.secondReg];
         }
-        if(ea.address.hasDisplacement && ea.address.displacement!=0){
+        // if(ea.address.hasDisplacement && ea.address.displacement!=0){
+        if(ea.address.hasDisplacement){
             if(ea.address.is16Bit){
                 int16_t sdata = static_cast<int16_t>(ea.address.displacement);
                 if(sdata>=0){

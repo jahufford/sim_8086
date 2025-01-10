@@ -14,11 +14,38 @@ struct TD;
 static std::unordered_map<std::string,Opcode> opcodes = { 
     {"100010xx", Opcode::MOV1},
     {"1100011x", Opcode::MOV2},
-    {"1011xxxx" ,Opcode::MOV3},
-    {"1010000x" ,Opcode::MOV4},
-    {"1010001x" ,Opcode::MOV5},
+    {"1011xxxx", Opcode::MOV3},
+    {"1010000x", Opcode::MOV4},
+    {"1010001x", Opcode::MOV5},
     // {"10001110" ,Opcode::MOV6},
     // {"10001100" ,Opcode::MOV7},
+    {"100000xx", Opcode::ADDSUBCMP2},
+    {"000000xx", Opcode::ADD1},
+    {"001010xx", Opcode::SUB1},
+    {"001110xx", Opcode::CMP1},
+    {"0000010x", Opcode::ADD3},
+    {"0010110x", Opcode::SUB3},
+    {"0011110x", Opcode::CMP3},
+    {"01110101", Opcode::JNZ},
+    {"01110100", Opcode::JE},
+    {"01111100", Opcode::JL},
+    {"01111110", Opcode::JLE},
+    {"01110010", Opcode::JB},
+    {"01110110", Opcode::JBE},
+    {"01111010", Opcode::JP},
+    {"01110000", Opcode::JO},
+    {"01111000", Opcode::JS},
+    {"01111101", Opcode::JNL},
+    {"01111111", Opcode::JG},
+    {"01110011", Opcode::JNB},
+    {"01110111", Opcode::JA},
+    {"01111011", Opcode::JNP},
+    {"01110001", Opcode::JNO},
+    {"01111001", Opcode::JNS},
+    {"11100000", Opcode::LOOPNZ},
+    {"11100001", Opcode::LOOPZ},
+    {"11100010", Opcode::LOOP},
+    {"11100011", Opcode::JCXZ},
     // {"10001100" ,Opcode::PUSH1},
     // {"01010xxx" ,Opcode::PUSH2},
     // {"000xx110" ,Opcode::PUSH3},
@@ -108,8 +135,11 @@ Opcode findInTree(std::string opcode_str)
     return findInTree_impl(decoder_tree, opcode_str.cbegin(), opcode_str.cend(), opcode_str);
 }
 
-Opcode decodeOpcode(uint8_t byte)
+Opcode decodeOpcode(uint8_t byte1, std::vector<uint8_t>::const_iterator byte_emitter)
 {
-    std::string opcode_str = makeString(byte);
-    return findInTree(opcode_str);
+    // uint8_t byte = (*byte_emitter++);
+    std::string opcode_str = makeString(byte1);
+    Opcode opcode = findInTree(opcode_str);
+
+    return opcode;
 }

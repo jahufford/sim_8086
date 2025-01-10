@@ -38,6 +38,43 @@ std::unordered_map<Opcode, DecodeIntructionFunc> decode_instruction =
     {Opcode::MOV3, decodeMOV3},
     {Opcode::MOV4, decodeMOV4},
     {Opcode::MOV5, decodeMOV5},
+    // {Opcode::ADD1, decodeADD1},
+    {Opcode::ADD1, decodeADDSUBCMP1},
+    {Opcode::SUB1, decodeADDSUBCMP1},
+    {Opcode::CMP1, decodeADDSUBCMP1},
+    // {Opcode::ADD2, decodeADD2},
+    // {Opcode::ADD2, decodeADDSUBCMP2},
+    {Opcode::ADDSUBCMP2, decodeADDSUBCMP2},
+    // {Opcode::ADD3, decodeADD3},
+    {Opcode::ADD3, decodeADDSUBCMP3},
+    {Opcode::SUB3, decodeADDSUBCMP3},
+    {Opcode::CMP3, decodeADDSUBCMP3},
+    {Opcode::JNZ, decodeJMP_s},
+    {Opcode::JE,  decodeJMP_s},
+    {Opcode::JL,  decodeJMP_s},
+    {Opcode::JLE, decodeJMP_s},
+    {Opcode::JB,  decodeJMP_s},
+    {Opcode::JBE, decodeJMP_s},
+    {Opcode::JP,  decodeJMP_s},
+    {Opcode::JO,  decodeJMP_s},
+    {Opcode::JS,  decodeJMP_s},
+    {Opcode::JNL, decodeJMP_s},
+    {Opcode::JG,  decodeJMP_s},
+    {Opcode::JNB, decodeJMP_s},
+    {Opcode::JA,  decodeJMP_s},
+    {Opcode::JNP, decodeJMP_s},
+    {Opcode::JNO, decodeJMP_s},
+    {Opcode::JNS, decodeJMP_s},
+    {Opcode::LOOP, decodeJMP_s},
+    {Opcode::LOOPZ, decodeJMP_s},
+    {Opcode::LOOPNZ, decodeJMP_s},
+    {Opcode::JCXZ, decodeJMP_s},
+
+    // {Opcode::SUB1, decodeSUB1},
+    // {Opcode::SUB2, decodeSUB2},
+    // {Opcode::SUB2, decodeADDSUBCMP2},
+    // {Opcode::SUB3, decodeSUB3},
+    // {Opcode::CMP1, decodeCMP1},
 };
 
 class InstructionStreamer
@@ -49,13 +86,12 @@ private:
     using pointer           = value_type const*;
     using reference         = value_type const&;
 
-
     Instruction current_instruction;
     std::vector<uint8_t>::const_iterator byte_emitter;
     std::vector<uint8_t>::const_iterator byte_end;
     void getAndDecodeInstruction(){
         uint8_t byte1 = (*byte_emitter++);
-        Opcode opcode = decodeOpcode(byte1);
+        Opcode opcode = decodeOpcode(byte1,byte_emitter);
         current_instruction = decode_instruction[opcode](byte1,byte_emitter);
     }
 public:
@@ -95,9 +131,10 @@ std::vector<Instruction> decodeInstructions(std::vector<uint8_t> binary_buffer)
     while(byte_emitter != binary_buffer.cend())
     {
         uint8_t byte1 = (*byte_emitter++);
-        Opcode opcode = decodeOpcode(byte1);
+        Opcode opcode = decodeOpcode(byte1,byte_emitter);
 
         Instruction inst = decode_instruction[opcode](byte1,byte_emitter);
+        // Instruction inst = decode_instruction[opcode](byte_emitter);
         instructions.push_back(inst);
     }
     return instructions;
